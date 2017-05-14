@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="300dp"
+    android:layout_height="wrap_content">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerInParent="true">
+
+        <RelativeLayout
+            android:id="@+id/top"
+            android:layout_width="280dp"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:background="@drawable/round_corner_top">
+
+            <TextView
+                android:id="@+id/game_over_text_head"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:paddingBottom="@dimen/padding_dialog_range_left"
+                android:paddingTop="@dimen/padding_dialog_range_left"
+                android:text="@string/gameover"
+                android:textColor="@color/textColor"
+                android:textSize="@dimen/head_text_size" />
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/game_over_text_head"
+                android:paddingBottom="@dimen/padding_dialog_range_left"
+                android:paddingLeft="@dimen/padding_dialog_range_left"
+                android:paddingRight="@dimen/padding_dialog_range_left"
+                android:paddingTop="150dp">
+
+                <include layout="@layout/gameover_score_partview_top" />
+            </RelativeLayout>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/RL_game_over_bottom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="@dimen/padding_dialog_range_left"
+            android:paddingTop="120dp">
+
+            <include layout="@layout/gameover_score_partview_bottom" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/top"
+            android:layout_centerHorizontal="true"
+            android:elevation="@dimen/elevation_size">
+
+            <include layout="@layout/gameover_continue_partview" />
+        </RelativeLayout>
+    </RelativeLayout>
+</RelativeLayout>

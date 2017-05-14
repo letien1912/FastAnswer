@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/round_corner_bottom"
+        android:paddingBottom="@dimen/padding_dialog_range_down"
+        android:paddingLeft="@dimen/padding_dialog_range_left"
+        android:paddingRight="@dimen/padding_dialog_range_left"
+        android:paddingTop="@dimen/padding_dialog_range_down"
+        >
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:contentDescription="@string/share_description"
+                android:src="@drawable/ic_share" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:contentDescription="@string/change_sound_volume"
+                android:src="@drawable/ic_sound" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:contentDescription="@string/menu_description"
+                android:src="@drawable/ic_home" />
+        </RelativeLayout>
+    </RelativeLayout>
+</RelativeLayout>
