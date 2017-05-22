@@ -56,7 +56,6 @@ public class GameOverDialog extends Dialog {
             public void onClick(View v) {
                 Toast.makeText(mContext, "ahihi", Toast.LENGTH_SHORT).show();
                 continueCountTimer();
-
                 dismiss();
             }
 
@@ -65,7 +64,8 @@ public class GameOverDialog extends Dialog {
     }
 
     private void continueCountTimer() {
-        new CounterTimer(counterTimer.getMillisecondsLeft(), 10, progressBar).start();
+        counterTimer = new CounterTimer(counterTimer.getMillisecondsLeft(), 10, progressBar);
+        counterTimer.start();
     }
 
     private void getTypeFaceFromAssert() {
@@ -97,5 +97,9 @@ public class GameOverDialog extends Dialog {
     protected void onStart() {
         counterTimer.cancel();
         super.onStart();
+    }
+
+    public void resetCounterTimer(CounterTimer counterTimer){
+        this.counterTimer = counterTimer;
     }
 }

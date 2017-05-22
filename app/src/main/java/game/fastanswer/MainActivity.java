@@ -4,7 +4,6 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.animation.Animation;
@@ -17,13 +16,11 @@ import android.widget.ViewSwitcher;
 import com.akexorcist.roundcornerprogressbar.IconRoundCornerProgressBar;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 import AppDialog.GameOverDialog;
 import AppDialog.PauseGameDialog;
 import Entities.Ask;
-import Entities.Quest;
 import Entities.Question;
 import Entities.RightAnswer;
 import Entities.WrongAnswer;
@@ -32,9 +29,12 @@ import Entities.WrongAnswer;
 public class MainActivity extends AppCompatActivity {
 
     private final static String QUESTION_HEADER = "Question ";
+    private static final long MAX_TIME = 4000;
 
-    private CounterTimer counter;
+    private CounterTimer currentCounter;
+    private CounterTimer defaultCounter;
     private IconRoundCornerProgressBar progressBar;
+
     private TextSwitcher textSwitcherQuestion;
     private ImageSwitcher imageSwitcherQuestion;
 
@@ -43,14 +43,12 @@ public class MainActivity extends AppCompatActivity {
     private TextView textQuestionHeader;
 
     private Typeface FontSnapITC;
-    private Typeface FontShowG;
 
-    private GameOverDialog gameOverDialog;
+    private ArrayList<Question> listQuest;
 
     private long timeLeft = 0;
     private int index = 0;
-    private ArrayList<Question> listQuest;
-    private PauseGameDialog pauseGameDialog;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,9 +73,8 @@ public class MainActivity extends AppCompatActivity {
         textAnswer02 = (TextView) findViewById(R.id.text_answer02);
         setTextTypeFace();
 
-        counter = new CounterTimer(4000, 10, progressBar);
-        gameOverDialog = new GameOverDialog(this, counter, progressBar);
-        pauseGameDialog = new PauseGameDialog(this,counter,progressBar);
+        defaultCounter = new CounterTimer(MAX_TIME, 10, progressBar);
+        currentCounter = defaultCounter;
     }
 
     private void setTextTypeFace() {
@@ -88,7 +85,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void getTypeFaceFromAssert() {
         FontSnapITC = Typeface.createFromAsset(getAssets(), "fonts/snap_itc.ttf");
-        FontShowG = Typeface.createFromAsset(getAssets(), "fonts/show_g.ttf");
     }
 
     private void setUpProgressBar() {
@@ -136,41 +132,36 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onPause() {
-        Log.d("TAG", "on onPause");
         super.onPause();
     }
 
     @Override
     protected void onRestart() {
-        gameOverDialog.show();
-        Log.d("TAG", "on onRestart");
+        new PauseGameDialog(this, currentCounter, progressBar).show();
+        progressBar.setProgress(timeLeft);
         super.onRestart();
     }
 
     @Override
     protected void onResume() {
-        progressBar.setProgress(timeLeft);
-        Log.d("TAG", "on onResume");
         super.onResume();
     }
 
     @Override
     protected void onDestroy() {
-        Log.d("TAG", "on onDestroy");
         super.onDestroy();
     }
 
     @Override
     protected void onStop() {
-        timeLeft = counter.getMillisecondsLeft();
-        counter.cancel();
-        Log.d("TAG", "on onStop");
+        timeLeft = currentCounter.getMillisecondsLeft();
+        currentCounter.setPause(true);
         super.onStop();
     }
 
     @Override
     public void onBackPressed() {
-        pauseGameDialog.show();
+        new PauseGameDialog(this, currentCounter, progressBar).show();
     }
 
     public void Answer01(View v) {
@@ -181,13 +172,17 @@ public class MainActivity extends AppCompatActivity {
         NextQuestion();
     }
 
-
     private void NextQuestion() {
-            counter.cancel();
-        counter.start();
+        ResetCounterTimer();
         SetQuestion();
         SetAnswer();
         index = index == listQuest.size() ? 0 : index + 1;
+    }
+
+    private void ResetCounterTimer() {
+        currentCounter.setPause(true);
+        currentCounter = new CounterTimer(MAX_TIME, 10, progressBar) ;
+        currentCounter.start();
     }
 
     private void SetQuestion() {
@@ -220,6 +215,9 @@ public class MainActivity extends AppCompatActivity {
         textAnswer02.setTextColor(color[1 - rdNumber]);
     }
 
+    public void setCurrentCounter(CounterTimer currentCounter) {
+        this.currentCounter = currentCounter;
+    }
 
     void initQuestion() {
         listQuest = new ArrayList<Question>();

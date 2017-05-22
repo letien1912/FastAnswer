@@ -39,6 +39,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
+                android:onClick="backToHomeEvent"
                 android:src="@drawable/ic_pause_home"/>
             <ImageView
                 android:id="@+id/button_restart"
