@@ -9,9 +9,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.view.View;
 import android.view.Window;
-import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.akexorcist.roundcornerprogressbar.IconRoundCornerProgressBar;
 
@@ -19,20 +17,12 @@ import game.fastanswer.CounterTimer;
 import game.fastanswer.MainActivity;
 import game.fastanswer.R;
 
-/**
- * Created by Admin on 12/05/2017.
- */
-
 public class PauseGameDialog extends Dialog implements View.OnClickListener {
     private final IconRoundCornerProgressBar progressBar;
     private Context mContext;
     private Typeface FontShowG;
     private TextView textPauseGame;
     private CounterTimer counterTimer;
-
-    private View btHome;
-    private View btRestart;
-    private View btContinue;
 
     public PauseGameDialog(@NonNull Context context, CounterTimer counterTimer, IconRoundCornerProgressBar progressBar) {
         super(context);
@@ -60,9 +50,9 @@ public class PauseGameDialog extends Dialog implements View.OnClickListener {
 
     private void init() {
         textPauseGame = (TextView) findViewById(R.id.text_pause_game);
-        btHome = findViewById(R.id.button_home);
-        btContinue = findViewById(R.id.button_continue);
-        btRestart = findViewById(R.id.button_restart);
+        View btHome = findViewById(R.id.button_home);
+        View btContinue = findViewById(R.id.button_continue);
+        View btRestart = findViewById(R.id.button_restart);
 
         btHome.setOnClickListener(this);
         btContinue.setOnClickListener(this);
@@ -88,28 +78,34 @@ public class PauseGameDialog extends Dialog implements View.OnClickListener {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.button_home:
-                backToHomeEvent();
+                BackToHome();
                 break;
             case R.id.button_continue:
                 ContinuePlayGame();
                 break;
             case R.id.button_restart:
+                RestartGame();
                 break;
         }
     }
 
-    private void backToHomeEvent() {
+    private void BackToHome() {
         dismiss();
         ((Activity) mContext).finish();
     }
 
     private void ContinuePlayGame() {
-        continueCountTimer();
+        ContinueCountTimer();
         dismiss();
     }
 
-    private void continueCountTimer() {
-        counterTimer = new CounterTimer(counterTimer.getMillisecondsLeft(), 10, progressBar);
+    private void RestartGame() {
+        dismiss();
+        ((MainActivity) mContext).CreateGamePlay();
+    }
+
+    private void ContinueCountTimer() {
+        counterTimer = new CounterTimer(counterTimer.getMillisecondsLeft(), 10, progressBar, ((MainActivity) mContext));
         ((MainActivity) mContext).setCurrentCounter(counterTimer);
         counterTimer.start();
     }

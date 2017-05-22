@@ -35,7 +35,7 @@
             android:src="@drawable/ic_sound"
             android:contentDescription="@string/change_sound_volume"
             android:onClick="ChangeSoundEvent"
-            android:id="@+id/imageView" />
+            android:id="@+id/button_sound" />
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

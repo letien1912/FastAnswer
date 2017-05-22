@@ -24,9 +24,10 @@ import Entities.Ask;
 import Entities.Question;
 import Entities.RightAnswer;
 import Entities.WrongAnswer;
+import Interface.IOnCounterTimerFinish;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements IOnCounterTimerFinish {
 
     private final static String QUESTION_HEADER = "Question ";
     private static final long MAX_TIME = 4000;
@@ -48,6 +49,8 @@ public class MainActivity extends AppCompatActivity {
 
     private long timeLeft = 0;
     private int index = 0;
+    private PauseGameDialog pauseGameDialog;
+    private GameOverDialog gameOverDialog;
 
 
     @Override
@@ -57,7 +60,6 @@ public class MainActivity extends AppCompatActivity {
 
         getTypeFaceFromAssert();
         init();
-        initQuestion();
         setUpProgressBar();
         setUpTextQuestion();
 
@@ -73,8 +75,12 @@ public class MainActivity extends AppCompatActivity {
         textAnswer02 = (TextView) findViewById(R.id.text_answer02);
         setTextTypeFace();
 
-        defaultCounter = new CounterTimer(MAX_TIME, 10, progressBar);
+        defaultCounter = new CounterTimer(MAX_TIME, 10, progressBar, this);
         currentCounter = defaultCounter;
+
+        pauseGameDialog = new PauseGameDialog(this, currentCounter, progressBar);
+        gameOverDialog = new GameOverDialog(this);
+
     }
 
     private void setTextTypeFace() {
@@ -91,8 +97,7 @@ public class MainActivity extends AppCompatActivity {
         progressBar.setProgressColor(Color.parseColor("#EC407A"));
         progressBar.setSecondaryProgressColor(Color.parseColor("#F06292"));
         progressBar.setProgressBackgroundColor(Color.parseColor("#F8BBD0"));
-        progressBar.setMax(4000f);
-        progressBar.setProgress(50f);
+        progressBar.setMax(MAX_TIME);
         progressBar.setIconBackgroundColor(Color.parseColor("#F8BBD0"));
         progressBar.setIconImageResource(R.mipmap.ic_launcher);
     }
@@ -102,7 +107,6 @@ public class MainActivity extends AppCompatActivity {
         makeView();
         addEvent();
     }
-
 
     private void addAnimation() {
         Animation in = AnimationUtils.loadAnimation(this, android.R.anim.slide_in_left);
@@ -137,31 +141,28 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onRestart() {
-        new PauseGameDialog(this, currentCounter, progressBar).show();
-        progressBar.setProgress(timeLeft);
+        if (checkDialogIsShowing()) {
+            pauseGameDialog = new PauseGameDialog(this, currentCounter, progressBar);
+            pauseGameDialog.show();
+            progressBar.setProgress(timeLeft);
+        }
         super.onRestart();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        CreateGamePlay();
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    public void CreateGamePlay() {
+        initQuestion();
+        index = 0;
+        setTheFirstAnswer();
     }
 
-    @Override
-    protected void onStop() {
-        timeLeft = currentCounter.getMillisecondsLeft();
-        currentCounter.setPause(true);
-        super.onStop();
-    }
-
-    @Override
-    public void onBackPressed() {
-        new PauseGameDialog(this, currentCounter, progressBar).show();
+    private void setTheFirstAnswer() {
+        NextQuestion();
     }
 
     public void Answer01(View v) {
@@ -176,18 +177,18 @@ public class MainActivity extends AppCompatActivity {
         ResetCounterTimer();
         SetQuestion();
         SetAnswer();
-        index = index == listQuest.size() ? 0 : index + 1;
+        index = index == listQuest.size() ? 0 : ++index;
     }
 
     private void ResetCounterTimer() {
-        currentCounter.setPause(true);
-        currentCounter = new CounterTimer(MAX_TIME, 10, progressBar) ;
+        currentCounter.cancel();
+        currentCounter = new CounterTimer(MAX_TIME, 10, progressBar, this);
         currentCounter.start();
     }
 
     private void SetQuestion() {
         String Question = listQuest.get(index).getQuestion().getText();
-        textQuestionHeader.setText(QUESTION_HEADER + index + 1);
+        textQuestionHeader.setText(QUESTION_HEADER + (index + 1));
         textSwitcherQuestion.setText(Question);
     }
 
@@ -215,12 +216,41 @@ public class MainActivity extends AppCompatActivity {
         textAnswer02.setTextColor(color[1 - rdNumber]);
     }
 
+    @Override
+    protected void onStop() {
+        timeLeft = currentCounter.getMillisecondsLeft();
+        currentCounter.cancel();
+        super.onStop();
+    }
+
+    /*Event When Counter timer finished*/
+    @Override
+    public void onFinished() {
+        if (checkDialogIsShowing()) {
+            gameOverDialog = new GameOverDialog(this);
+            gameOverDialog.show();
+        }
+    }
+
+    private boolean checkDialogIsShowing() {
+        return !(pauseGameDialog.isShowing() || gameOverDialog.isShowing());
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(checkDialogIsShowing()){
+            pauseGameDialog = new PauseGameDialog(this, currentCounter, progressBar);
+            pauseGameDialog.show();
+        }
+    }
+
+
     public void setCurrentCounter(CounterTimer currentCounter) {
         this.currentCounter = currentCounter;
     }
 
     void initQuestion() {
-        listQuest = new ArrayList<Question>();
+        listQuest = new ArrayList<>();
         Q1();
         Q2();
         Q3();
@@ -267,5 +297,6 @@ public class MainActivity extends AppCompatActivity {
         Question q = new Question(a, r, w);
         listQuest.add(q);
     }
+
 }
 

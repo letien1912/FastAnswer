@@ -1,41 +1,33 @@
 package AppDialog;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
-import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.akexorcist.roundcornerprogressbar.IconRoundCornerProgressBar;
-
-import game.fastanswer.CounterTimer;
+import game.fastanswer.MainActivity;
 import game.fastanswer.R;
 
 /**
  * Created by Admin on 06/05/2017.
  */
 
-public class GameOverDialog extends Dialog {
+    public class GameOverDialog extends Dialog implements View.OnClickListener {
 
-    private final IconRoundCornerProgressBar progressBar;
     private Context mContext;
     private Typeface FontShowG;
     private Typeface FontSnapITC;
     private TextView textScorePoint;
     private TextView textHighScorePoint;
-    private CounterTimer counterTimer;
 
-    public GameOverDialog(@NonNull Context context, CounterTimer counterTimer, IconRoundCornerProgressBar progressBar) {
+    public GameOverDialog(@NonNull Context context) {
         super(context);
-        this.counterTimer = counterTimer;
-        this.progressBar = progressBar;
         mContext = context;
     }
 
@@ -50,22 +42,6 @@ public class GameOverDialog extends Dialog {
         init();
         addFontType();
         preventCancelClickOutSide();
-        View im = findViewById(R.id.button_continue);
-        im.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(mContext, "ahihi", Toast.LENGTH_SHORT).show();
-                continueCountTimer();
-                dismiss();
-            }
-
-
-        });
-    }
-
-    private void continueCountTimer() {
-        counterTimer = new CounterTimer(counterTimer.getMillisecondsLeft(), 10, progressBar);
-        counterTimer.start();
     }
 
     private void getTypeFaceFromAssert() {
@@ -76,6 +52,16 @@ public class GameOverDialog extends Dialog {
     private void init() {
         textScorePoint = (TextView) findViewById(R.id.game_over_score_point);
         textHighScorePoint = (TextView) findViewById(R.id.game_over_high_score_point);
+
+        View btContinue = findViewById(R.id.button_continue);
+        View btHome = findViewById(R.id.button_home);
+        View btSound = findViewById(R.id.button_sound);
+        View btShare = findViewById(R.id.button_share);
+
+        btContinue.setOnClickListener(this);
+        btHome.setOnClickListener(this);
+        btSound.setOnClickListener(this);
+        btShare.setOnClickListener(this);
     }
 
     private void addFontType() {
@@ -94,12 +80,38 @@ public class GameOverDialog extends Dialog {
     }
 
     @Override
-    protected void onStart() {
-        counterTimer.cancel();
-        super.onStart();
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.button_home:
+                BackToHome();
+                break;
+            case R.id.button_continue:
+                PlayNewGame();
+                break;
+            case R.id.button_share:
+                ShareGame();
+                break;
+            case R.id.button_sound:
+                ChangeSound();
+                break;
+        }
     }
 
-    public void resetCounterTimer(CounterTimer counterTimer){
-        this.counterTimer = counterTimer;
+    private void BackToHome() {
+        dismiss();
+        ((Activity) mContext).finish();
+    }
+
+    private void PlayNewGame() {
+        dismiss();
+        ((MainActivity) mContext).CreateGamePlay();
+    }
+
+    private void ShareGame() {
+
+    }
+
+    private void ChangeSound() {
+
     }
 }

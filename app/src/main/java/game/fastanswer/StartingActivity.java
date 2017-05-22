@@ -23,8 +23,8 @@ public class StartingActivity extends AppCompatActivity {
         ChangeSound();
     }
 
-    private void ChangeSound() {
 
+    private void ChangeSound() {
         AudioManager amanager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             amanager.adjustStreamVolume(AudioManager.STREAM_MUSIC, sound ? AudioManager.ADJUST_MUTE : AudioManager.ADJUST_UNMUTE, 0);
@@ -45,17 +45,6 @@ public class StartingActivity extends AppCompatActivity {
         share.putExtra(Intent.EXTRA_TEXT, message);
         startActivity(Intent.createChooser(share, message));
         Log.d("Share Game Event", "Share done");
-    }
-
-    public void ChangeSoundEvent(View v) {
-        ChangeSoundSharePref();
-        ChangeSound();
-    }
-
-    private void ChangeSoundSharePref() {
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putBoolean(getString(R.string.pref_change_sound), !sound);
-        editor.apply();
     }
 
     public void ViewScoreEvent(View v) {
