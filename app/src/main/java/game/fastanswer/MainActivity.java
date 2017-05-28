@@ -4,6 +4,8 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.animation.Animation;
@@ -14,23 +16,35 @@ import android.widget.TextView;
 import android.widget.ViewSwitcher;
 
 import com.akexorcist.roundcornerprogressbar.IconRoundCornerProgressBar;
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.InterstitialAd;
+import com.google.android.gms.ads.MobileAds;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 import AppDialog.GameOverDialog;
 import AppDialog.PauseGameDialog;
-import Entities.Ask;
-import Entities.Question;
-import Entities.RightAnswer;
-import Entities.WrongAnswer;
+import Entities.GameColor;
+import Entities.GamePlay;
 import Interface.IOnCounterTimerFinish;
+import Utilities.CounterTimer;
+import Utilities.GameSound;
 
 
 public class MainActivity extends AppCompatActivity implements IOnCounterTimerFinish {
 
     private final static String QUESTION_HEADER = "Question ";
     private static final long MAX_TIME = 4000;
+    private static final int LEVEL_01 = 1;
+    private static final int LEVEL_02 = 2;
+    private static final int LEVEL_03 = 3;
+    private static final int LEVEL_04 = 4;
+    private static final int LEVEL_05 = 5;
 
     private CounterTimer currentCounter;
     private CounterTimer defaultCounter;
@@ -45,13 +59,17 @@ public class MainActivity extends AppCompatActivity implements IOnCounterTimerFi
 
     private Typeface FontSnapITC;
 
-    private ArrayList<Question> listQuest;
-
     private long timeLeft = 0;
     private int index = 0;
+    private int defaultTextSize;
     private PauseGameDialog pauseGameDialog;
     private GameOverDialog gameOverDialog;
 
+    private GamePlay gamePlay;
+    private int rightColor;
+
+    private GameSound gameSound;
+    private InterstitialAd mInterstitialAd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +80,7 @@ public class MainActivity extends AppCompatActivity implements IOnCounterTimerFi
         init();
         setUpProgressBar();
         setUpTextQuestion();
-
+        CreateGamePlay();
     }
 
     private void init() {
@@ -79,8 +97,11 @@ public class MainActivity extends AppCompatActivity implements IOnCounterTimerFi
         currentCounter = defaultCounter;
 
         pauseGameDialog = new PauseGameDialog(this, currentCounter, progressBar);
-        gameOverDialog = new GameOverDialog(this);
+        gameOverDialog = new GameOverDialog(this, 0);
 
+        gameSound = new GameSound(this);
+
+        defaultTextSize = getResources().getDimensionPixelSize(R.dimen.answer_text_size);
     }
 
     private void setTextTypeFace() {
@@ -99,7 +120,7 @@ public class MainActivity extends AppCompatActivity implements IOnCounterTimerFi
         progressBar.setProgressBackgroundColor(Color.parseColor("#F8BBD0"));
         progressBar.setMax(MAX_TIME);
         progressBar.setIconBackgroundColor(Color.parseColor("#F8BBD0"));
-        progressBar.setIconImageResource(R.mipmap.ic_launcher);
+        progressBar.setIconImageResource(R.drawable.ic_clock);
     }
 
     private void setUpTextQuestion() {
@@ -134,30 +155,10 @@ public class MainActivity extends AppCompatActivity implements IOnCounterTimerFi
 
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-    }
-
-    @Override
-    protected void onRestart() {
-        if (checkDialogIsShowing()) {
-            pauseGameDialog = new PauseGameDialog(this, currentCounter, progressBar);
-            pauseGameDialog.show();
-            progressBar.setProgress(timeLeft);
-        }
-        super.onRestart();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        CreateGamePlay();
-    }
-
     public void CreateGamePlay() {
         initQuestion();
         index = 0;
+        progressBar.setMax(GamePlay.MAX_TIME);
         setTheFirstAnswer();
     }
 
@@ -165,40 +166,147 @@ public class MainActivity extends AppCompatActivity implements IOnCounterTimerFi
         NextQuestion();
     }
 
+
     public void Answer01(View v) {
-        NextQuestion();
+        if (MatchAnswer(textAnswer01)) {
+            NextQuestion();
+        } else {
+            ShowGameOverDialog();
+        }
+    }
+
+    private void ShowGameOverDialog() {
+        gameSound.PlayGameOverSound();
+        currentCounter.cancel();
+        gameOverDialog = new GameOverDialog(this, gamePlay.getScore());
+        gameOverDialog.show();
+//        if(mInterstitialAd.isLoaded())
+//            mInterstitialAd.show();
     }
 
     public void Answer02(View v) {
-        NextQuestion();
+        if (MatchAnswer(textAnswer02))
+            NextQuestion();
+        else {
+            ShowGameOverDialog();
+        }
+    }
+
+    private boolean MatchAnswer(TextView textAnswer) {
+        return textAnswer.getText().equals(gamePlay.getListGameColor().get(rightColor).getColorName());
     }
 
     private void NextQuestion() {
+        gameSound.PlayNextQuestionSound();
+
+        gamePlay.nextScore();
+        Random rd = new Random();
+
+        int lenColor = gamePlay.getListGameColor().size();
+        int lenQuestion = gamePlay.getListGameQuestion().size();
+
+        rightColor = rd.nextInt(lenColor);
+        int indexAnswerColor1 = rd.nextInt(lenColor);
+        int indexAnswerColor2 = rd.nextInt(lenColor);
+
+//        int indexColorText = rd.nextInt(lenColor);
+        int indexQuestionText = rd.nextInt(lenQuestion);
+
+        int wrongColor;
+        do {
+            wrongColor = rd.nextInt(lenQuestion);
+        } while (rightColor == wrongColor);
+
+        int level = gamePlay.getLv();
+        int rightAnswerColor01;
+        int rightAnswerColor02;
+        switch (level) {
+            case LEVEL_01:
+                rightAnswerColor01 = rightColor;
+                rightAnswerColor02 = wrongColor;
+                Log.d("LEVEL", "level = 1");
+                break;
+            case LEVEL_02:
+                rightAnswerColor01 = indexAnswerColor1;
+                rightAnswerColor02 = indexAnswerColor1;
+                Log.d("LEVEL", "level = 2");
+                break;
+            case LEVEL_03:
+                rightAnswerColor01 = indexAnswerColor1;
+                rightAnswerColor02 = indexAnswerColor2;
+                Log.d("LEVEL", "level = 3");
+                break;
+            case LEVEL_04:
+                rightAnswerColor01 = wrongColor;
+                rightAnswerColor02 = rightColor;
+                Log.d("LEVEL", "level = 4");
+                break;
+            case LEVEL_05:
+                int random = rd.nextInt(10);
+                if (random < 7) {
+                    rightAnswerColor01 = indexAnswerColor1;
+                    rightAnswerColor02 = indexAnswerColor2;
+                } else {
+                    rightAnswerColor01 = indexAnswerColor2;
+                    rightAnswerColor02 = indexAnswerColor1;
+                }
+                Log.d("LEVEL", "level = 5");
+                break;
+            default:
+                random = rd.nextInt(10);
+                if (random <= 7) {
+                    rightAnswerColor01 = indexAnswerColor1;
+                    rightAnswerColor02 = indexAnswerColor2;
+                } else {
+                    rightAnswerColor01 = indexAnswerColor2;
+                    rightAnswerColor02 = indexAnswerColor1;
+                }
+                SetTextSize();
+                break;
+        }
+
         ResetCounterTimer();
-        SetQuestion();
-        SetAnswer();
-        index = index == listQuest.size() ? 0 : ++index;
+        SetQuestion(rightColor, indexQuestionText);
+        SetAnswer(rightColor, wrongColor, rightAnswerColor01, rightAnswerColor02);
+        ++index;
+    }
+
+    private void SetTextSize() {
+        int rangeRandom = 3;
+        Random rd = new Random();
+        int rdValue1 = -rangeRandom + rd.nextInt(2*rangeRandom + 2);
+        int rdValue2 = -rangeRandom + rd.nextInt(2*rangeRandom + 2);
+        textAnswer01.setTextSize(TypedValue.COMPLEX_UNIT_PX, defaultTextSize + rdValue1);
+        textAnswer02.setTextSize(TypedValue.COMPLEX_UNIT_PX, defaultTextSize + rdValue2);
     }
 
     private void ResetCounterTimer() {
         currentCounter.cancel();
-        currentCounter = new CounterTimer(MAX_TIME, 10, progressBar, this);
+        currentCounter = new CounterTimer(gamePlay.getTime(), 10, progressBar, this);
+        progressBar.setMax(gamePlay.getTime());
         currentCounter.start();
     }
 
-    private void SetQuestion() {
-        String Question = listQuest.get(index).getQuestion().getText();
+    private void SetQuestion(int indexColor, int indexQuestionText) {
+        String Question = gamePlay.getListGameQuestion().get(indexQuestionText);
+
         textQuestionHeader.setText(QUESTION_HEADER + (index + 1));
         textSwitcherQuestion.setText(Question);
+        ((TextView) textSwitcherQuestion.getCurrentView()).setTextColor(gamePlay.getListGameColor().get(indexColor).getColor());
     }
 
-    private void SetAnswer() {
-        Question answer = listQuest.get(index);
-        String rightAnswer = answer.getRightAnswer().getText();
-        String wrongAnswer = answer.getWrongAnswer().getText();
+    private void SetAnswer(int indexColor, int indexWrongColor, int rightAnswerColor01, int rightAnswerColor02) {
 
-        int rightColor = answer.getRightAnswer().getTextColor();
-        int wrongColor = answer.getWrongAnswer().getTextColor();
+        GameColor rightAnswerGameColorText = gamePlay.getListGameColor().get(indexColor);
+        GameColor rightAnswerGameColor01 = gamePlay.getListGameColor().get(rightAnswerColor01);
+        GameColor rightAnswerGameColor02 = gamePlay.getListGameColor().get(rightAnswerColor02);
+        GameColor wrongAnswerGameColor = gamePlay.getListGameColor().get(indexWrongColor);
+
+        String rightAnswer = rightAnswerGameColorText.getColorName();
+        String wrongAnswer = wrongAnswerGameColor.getColorName();
+
+        int rightColor = rightAnswerGameColor01.getColor();
+        int wrongColor = rightAnswerGameColor02.getColor();
 
         String[] asw = {rightAnswer, wrongAnswer};
         int[] color = {rightColor, wrongColor};
@@ -208,12 +316,35 @@ public class MainActivity extends AppCompatActivity implements IOnCounterTimerFi
 
     private void setTextContent(String[] asw, int[] color) {
         Random rd = new Random();
-        int rdNumber = rd.nextInt(1);
+        int rdNumber = rd.nextInt(2);
         textAnswer01.setText(asw[rdNumber]);
         textAnswer02.setText(asw[1 - rdNumber]);
 
         textAnswer01.setTextColor(color[rdNumber]);
         textAnswer02.setTextColor(color[1 - rdNumber]);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        //loadAdMobView();
+    }
+    private void loadAdMobView() {
+//        MobileAds.initialize(getApplicationContext(),
+//                "");
+        AdView mAdView = (AdView) findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().addTestDevice("6809ACF1EA2A16A4").build();
+        mAdView.loadAd(adRequest);
+//        mInterstitialAd = new InterstitialAd(this);
+////        mInterstitialAd.setAdUnitId("ca-app-pub-5689571762868774/3432788847");
+//        mInterstitialAd.setAdUnitId("ca-app-pub-0664570763252260/1769900428");
+//        mInterstitialAd.loadAd(new AdRequest.Builder().build());
+//        mInterstitialAd.setAdListener(new AdListener() {
+//            @Override
+//            public void onAdClosed() {
+//                // Load the next interstitial.
+//            }
+//        });
     }
 
     @Override
@@ -227,8 +358,7 @@ public class MainActivity extends AppCompatActivity implements IOnCounterTimerFi
     @Override
     public void onFinished() {
         if (checkDialogIsShowing()) {
-            gameOverDialog = new GameOverDialog(this);
-            gameOverDialog.show();
+            ShowGameOverDialog();
         }
     }
 
@@ -238,64 +368,61 @@ public class MainActivity extends AppCompatActivity implements IOnCounterTimerFi
 
     @Override
     public void onBackPressed() {
-        if(checkDialogIsShowing()){
+        ShowPauseGameDialog();
+    }
+
+    private void ShowPauseGameDialog() {
+        if (checkDialogIsShowing()) {
             pauseGameDialog = new PauseGameDialog(this, currentCounter, progressBar);
             pauseGameDialog.show();
         }
     }
 
-
     public void setCurrentCounter(CounterTimer currentCounter) {
         this.currentCounter = currentCounter;
     }
 
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        ShowPauseGameDialog();
+        progressBar.setProgress(currentCounter.getMillisecondsLeft());
+    }
+
     void initQuestion() {
-        listQuest = new ArrayList<>();
-        Q1();
-        Q2();
-        Q3();
-        Q4();
-        Q5();
+        List<GameColor> gameColors = AddGameColor();
+        List<String> gameQuestions = AddQuestion();
+        gamePlay = new GamePlay(gameColors, gameQuestions);
+
+//        listQuest = new ArrayList<>();
+//        Q1();
+//        Q2();
+//        Q3();
+//        Q4();
+//        Q5();
     }
 
-    void Q1() {
-        RightAnswer r = new RightAnswer("Red");
-        WrongAnswer w = new WrongAnswer("Green");
-        Ask a = new Ask("Hình Tròn Màu Đỏ");
-        Question q = new Question(a, r, w);
-        listQuest.add(q);
+    private List<GameColor> AddGameColor() {
+        List<GameColor> gameColors = new ArrayList<>();
+        GameColor g = new GameColor(Color.RED, "Đo");
+        GameColor g1 = new GameColor(Color.YELLOW, "Vàng");
+        GameColor g2 = new GameColor(Color.BLUE, "Xanh Dương");
+        GameColor g3 = new GameColor(Color.GREEN, "Xanh Lá");
+        GameColor g4 = new GameColor(Color.BLACK, "Đen");
+        GameColor g5 = new GameColor(Color.CYAN, "Lục Lam");
+
+        gameColors.add(g);
+        gameColors.add(g1);
+        gameColors.add(g2);
+        gameColors.add(g3);
+        gameColors.add(g4);
+        gameColors.add(g5);
+        return gameColors;
     }
 
-    void Q2() {
-        RightAnswer r = new RightAnswer("Red", Color.DKGRAY);
-        WrongAnswer w = new WrongAnswer("Green", Color.YELLOW);
-        Ask a = new Ask("Hình Vuong Màu Xanh");
-        Question q = new Question(a, r, w);
-        listQuest.add(q);
-    }
-
-    void Q3() {
-        RightAnswer r = new RightAnswer("Red", Color.YELLOW);
-        WrongAnswer w = new WrongAnswer("Green", Color.YELLOW);
-        Ask a = new Ask("Hình R Màu Xanh");
-        Question q = new Question(a, r, w);
-        listQuest.add(q);
-    }
-
-    void Q4() {
-        WrongAnswer w = new WrongAnswer("Red", Color.RED);
-        RightAnswer r = new RightAnswer("Green", Color.GREEN);
-        Ask a = new Ask("Hình tam giác Màu Xanh");
-        Question q = new Question(a, r, w);
-        listQuest.add(q);
-    }
-
-    void Q5() {
-        RightAnswer r = new RightAnswer("Red", Color.RED);
-        WrongAnswer w = new WrongAnswer("Green", Color.GREEN);
-        Ask a = new Ask("Hình Học Màu Đỏ");
-        Question q = new Question(a, r, w);
-        listQuest.add(q);
+    private List<String> AddQuestion() {
+        String[] q = {"Hình Tròn ", "Hình Vuông", "Hình Chữ Nhật", "Hình Tam Giác"};
+        return Arrays.asList(q);
     }
 
 }

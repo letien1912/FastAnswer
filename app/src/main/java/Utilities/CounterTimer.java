@@ -1,4 +1,4 @@
-package game.fastanswer;
+package Utilities;
 
 import android.os.CountDownTimer;
 

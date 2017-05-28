@@ -5,7 +5,6 @@
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
@@ -15,9 +14,10 @@
         android:id="@+id/rl_progress_2"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:background="@drawable/white_background"
+        android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true">
+        android:layout_marginBottom="@dimen/activity_vertical_margin"
+        android:background="@drawable/white_background">
 
         <com.akexorcist.roundcornerprogressbar.IconRoundCornerProgressBar
             android:id="@+id/progress_2"
@@ -28,62 +28,85 @@
             app:rcIconPadding="3dp"
             app:rcIconSize="50dp" />
 
-        <android.support.v7.widget.CardView
-            android:id="@+id/Answer01"
-            android:layout_width="@dimen/button_choose_answer_size"
-            android:layout_height="@dimen/button_choose_answer_size"
+        <LinearLayout
+            android:id="@+id/rl_answer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:layout_alignParentStart="true"
-            app:cardElevation="@dimen/elevation_size"
-            app:cardPreventCornerOverlap="false"
-            android:onClick="Answer01">
+            android:orientation="horizontal"
+            android:baselineAligned="false"
+            android:paddingBottom="@dimen/padding_dialog_range_left">
 
             <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@drawable/button_choose_answer">
+                android:id="@+id/rl_answer_start"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
 
-                <TextView
-                    android:id="@+id/text_answer01"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:text="@string/answer_01"
-                    android:textSize="@dimen/answer_text_size" />
+                <android.support.v7.widget.CardView
+                    android:layout_centerHorizontal="true"
+                    android:id="@+id/Answer01"
+                    android:layout_width="@dimen/button_choose_answer_size"
+                    android:layout_height="@dimen/button_choose_answer_size"
+                    android:onClick="Answer01"
+                    app:cardElevation="@dimen/elevation_size"
+                    app:cardPreventCornerOverlap="false">
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/button_choose_answer">
+
+                        <TextView
+                            android:id="@+id/text_answer01"
+                            android:gravity="center"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_centerInParent="true"
+                            android:text="@string/answer_01"
+                            android:textSize="@dimen/answer_text_size" />
+                    </RelativeLayout>
+                </android.support.v7.widget.CardView>
             </RelativeLayout>
-        </android.support.v7.widget.CardView>
-
-        <android.support.v7.widget.CardView
-            android:id="@+id/Answer02"
-            android:layout_width="@dimen/button_choose_answer_size"
-            android:layout_height="@dimen/button_choose_answer_size"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentEnd="true"
-            app:cardPreventCornerOverlap="false"
-            app:cardElevation="@dimen/elevation_size"
-            android:onClick="Answer02">
 
             <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@drawable/button_choose_answer">
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
 
-                <TextView
-                    android:id="@+id/text_answer02"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:text="@string/answer_02"
-                    android:textSize="@dimen/answer_text_size" />
+                <android.support.v7.widget.CardView
+                    android:layout_centerHorizontal="true"
+                    android:id="@+id/Answer02"
+                    android:layout_width="@dimen/button_choose_answer_size"
+                    android:layout_height="@dimen/button_choose_answer_size"
+                    android:onClick="Answer02"
+                    app:cardElevation="@dimen/elevation_size"
+                    app:cardPreventCornerOverlap="false">
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/button_choose_answer">
+
+                        <TextView
+                            android:id="@+id/text_answer02"
+                            android:gravity="center"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_centerInParent="true"
+                            android:text="@string/answer_02"
+                            android:textSize="@dimen/answer_text_size" />
+                    </RelativeLayout>
+                </android.support.v7.widget.CardView>
             </RelativeLayout>
-        </android.support.v7.widget.CardView>
+        </LinearLayout>
 
         <RelativeLayout
             android:id="@+id/include_question_main"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_above="@id/Answer01"
-            android:layout_below="@id/progress_2">
+            android:layout_above="@id/rl_answer"
+            android:layout_below="@+id/progress_2">
 
             <FrameLayout
                 android:layout_width="wrap_content"
@@ -91,6 +114,15 @@
                 android:layout_centerInParent="true">
 
                 <include layout="@layout/question_main" />
+
+                <com.google.android.gms.ads.AdView
+                    android:id="@+id/adView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_centerHorizontal="true"
+                    app:adSize="BANNER"
+                    app:adUnitId="ca-app-pub-0664570763252260/3326522424"></com.google.android.gms.ads.AdView>
             </FrameLayout>
         </RelativeLayout>
     </RelativeLayout>

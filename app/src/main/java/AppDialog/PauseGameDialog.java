@@ -13,7 +13,7 @@ import android.widget.TextView;
 
 import com.akexorcist.roundcornerprogressbar.IconRoundCornerProgressBar;
 
-import game.fastanswer.CounterTimer;
+import Utilities.CounterTimer;
 import game.fastanswer.MainActivity;
 import game.fastanswer.R;
 
