@@ -13,6 +13,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageSwitcher;
 import android.widget.TextSwitcher;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
 import com.akexorcist.roundcornerprogressbar.IconRoundCornerProgressBar;
@@ -78,6 +79,7 @@ public class MainActivity extends AppCompatActivity implements IOnCounterTimerFi
 
         getTypeFaceFromAssert();
         init();
+        loadAdMobView();
         setUpProgressBar();
         setUpTextQuestion();
         CreateGamePlay();
@@ -145,7 +147,7 @@ public class MainActivity extends AppCompatActivity implements IOnCounterTimerFi
                 TextView textContain = new TextView(MainActivity.this);
                 textContain.setGravity(Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL);
                 textContain.setTextSize(getResources().getDimensionPixelSize(R.dimen.answer_text_size));
-                textContain.setTypeface(Typeface.SANS_SERIF);
+                textContain.setTypeface(FontSnapITC);
                 return textContain;
             }
         });
@@ -155,11 +157,50 @@ public class MainActivity extends AppCompatActivity implements IOnCounterTimerFi
 
     }
 
+    private void loadAdMobView() {
+        MobileAds.initialize(getApplicationContext(),
+                "ca-app-pub-5794865694837942~5235770314");
+        AdView mAdView = (AdView) findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().addTestDevice("ABF39522DBD56E4B15D7A6D9D6FF6547").build();
+        mAdView.loadAd(adRequest);
+        mInterstitialAd = new InterstitialAd(this);
+//        mInterstitialAd.setAdUnitId("ca-app-pub-5689571762868774/3432788847");
+        mInterstitialAd.setAdUnitId("ca-app-pub-5794865694837942/3479835513");
+        mInterstitialAd.loadAd(new AdRequest.Builder().addTestDevice("ABF39522DBD56E4B15D7A6D9D6FF6547").build());
+        mInterstitialAd.setAdListener(new AdListener() {
+            @Override
+            public void onAdClosed() {
+                Toast.makeText(getApplicationContext(), "Ad is closed!", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onAdFailedToLoad(int errorCode) {
+                Toast.makeText(getApplicationContext(), "Ad failed to load! error code: " + errorCode, Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onAdLeftApplication() {
+                Toast.makeText(getApplicationContext(), "Ad left application!", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onAdOpened() {
+                Toast.makeText(getApplicationContext(), "Ad is opened!", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     public void CreateGamePlay() {
         initQuestion();
+        setDefaultSomeThing();
+        setTheFirstAnswer();
+    }
+
+    private void setDefaultSomeThing() {
         index = 0;
         progressBar.setMax(GamePlay.MAX_TIME);
-        setTheFirstAnswer();
+        textAnswer01.setTextSize(TypedValue.COMPLEX_UNIT_PX, defaultTextSize);
+        textAnswer02.setTextSize(TypedValue.COMPLEX_UNIT_PX, defaultTextSize);
     }
 
     private void setTheFirstAnswer() {
@@ -180,8 +221,8 @@ public class MainActivity extends AppCompatActivity implements IOnCounterTimerFi
         currentCounter.cancel();
         gameOverDialog = new GameOverDialog(this, gamePlay.getScore());
         gameOverDialog.show();
-//        if(mInterstitialAd.isLoaded())
-//            mInterstitialAd.show();
+        if (mInterstitialAd.isLoaded())
+            mInterstitialAd.show();
     }
 
     public void Answer02(View v) {
@@ -217,11 +258,11 @@ public class MainActivity extends AppCompatActivity implements IOnCounterTimerFi
             wrongColor = rd.nextInt(lenQuestion);
         } while (rightColor == wrongColor);
 
-        int level = gamePlay.getLv();
         int rightAnswerColor01;
         int rightAnswerColor02;
-        switch (level) {
+        switch (gamePlay.getLv()) {
             case LEVEL_01:
+                Log.d("TestTextSize", textAnswer01.getTextSize() + "");
                 rightAnswerColor01 = rightColor;
                 rightAnswerColor02 = wrongColor;
                 Log.d("LEVEL", "level = 1");
@@ -272,12 +313,15 @@ public class MainActivity extends AppCompatActivity implements IOnCounterTimerFi
     }
 
     private void SetTextSize() {
-        int rangeRandom = 3;
+        int rangeRandom = 8;
         Random rd = new Random();
-        int rdValue1 = -rangeRandom + rd.nextInt(2*rangeRandom + 2);
-        int rdValue2 = -rangeRandom + rd.nextInt(2*rangeRandom + 2);
+        int rdValue1 = -rangeRandom + rd.nextInt(2 * rangeRandom + 2);
+        int rdValue2 = -rangeRandom + rd.nextInt(2 * rangeRandom + 2);
         textAnswer01.setTextSize(TypedValue.COMPLEX_UNIT_PX, defaultTextSize + rdValue1);
         textAnswer02.setTextSize(TypedValue.COMPLEX_UNIT_PX, defaultTextSize + rdValue2);
+        Log.d("TestTextSize", "----------------------------" + defaultTextSize);
+        Log.d("TestTextSize 1", (rdValue1) + "-" + (defaultTextSize + rdValue1));
+        Log.d("TestTextSize 2", (rdValue2) + "-" + (defaultTextSize + rdValue2));
     }
 
     private void ResetCounterTimer() {
@@ -325,29 +369,6 @@ public class MainActivity extends AppCompatActivity implements IOnCounterTimerFi
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        //loadAdMobView();
-    }
-    private void loadAdMobView() {
-//        MobileAds.initialize(getApplicationContext(),
-//                "");
-        AdView mAdView = (AdView) findViewById(R.id.adView);
-        AdRequest adRequest = new AdRequest.Builder().addTestDevice("6809ACF1EA2A16A4").build();
-        mAdView.loadAd(adRequest);
-//        mInterstitialAd = new InterstitialAd(this);
-////        mInterstitialAd.setAdUnitId("ca-app-pub-5689571762868774/3432788847");
-//        mInterstitialAd.setAdUnitId("ca-app-pub-0664570763252260/1769900428");
-//        mInterstitialAd.loadAd(new AdRequest.Builder().build());
-//        mInterstitialAd.setAdListener(new AdListener() {
-//            @Override
-//            public void onAdClosed() {
-//                // Load the next interstitial.
-//            }
-//        });
-    }
-
-    @Override
     protected void onStop() {
         timeLeft = currentCounter.getMillisecondsLeft();
         currentCounter.cancel();
@@ -387,6 +408,7 @@ public class MainActivity extends AppCompatActivity implements IOnCounterTimerFi
         super.onRestart();
         ShowPauseGameDialog();
         progressBar.setProgress(currentCounter.getMillisecondsLeft());
+
     }
 
     void initQuestion() {
@@ -404,12 +426,12 @@ public class MainActivity extends AppCompatActivity implements IOnCounterTimerFi
 
     private List<GameColor> AddGameColor() {
         List<GameColor> gameColors = new ArrayList<>();
-        GameColor g = new GameColor(Color.RED, "Đo");
-        GameColor g1 = new GameColor(Color.YELLOW, "Vàng");
-        GameColor g2 = new GameColor(Color.BLUE, "Xanh Dương");
-        GameColor g3 = new GameColor(Color.GREEN, "Xanh Lá");
-        GameColor g4 = new GameColor(Color.BLACK, "Đen");
-        GameColor g5 = new GameColor(Color.CYAN, "Lục Lam");
+        GameColor g = new GameColor(Color.RED, "RED");
+        GameColor g1 = new GameColor(Color.YELLOW, "YELLOW");
+        GameColor g2 = new GameColor(Color.BLUE, "BLUE");
+        GameColor g3 = new GameColor(Color.GREEN, "GREEN");
+        GameColor g4 = new GameColor(Color.BLACK, "BLACK");
+        GameColor g5 = new GameColor(Color.CYAN, "CYAN");
 
         gameColors.add(g);
         gameColors.add(g1);
@@ -421,7 +443,7 @@ public class MainActivity extends AppCompatActivity implements IOnCounterTimerFi
     }
 
     private List<String> AddQuestion() {
-        String[] q = {"Hình Tròn ", "Hình Vuông", "Hình Chữ Nhật", "Hình Tam Giác"};
+        String[] q = {"Hình Tròn đ", "Hình Vuông đ", "Hình Chữ Nhật đ", "Hình Tam Giác đ"};
         return Arrays.asList(q);
     }
 

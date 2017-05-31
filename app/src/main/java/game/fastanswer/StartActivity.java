@@ -24,6 +24,7 @@ public class StartActivity extends AppCompatActivity {
         sharedPref = getSharedPreferences(getString(R.string.pref_change_sound), MODE_PRIVATE);
         sound = sharedPref.getBoolean(getString(R.string.pref_change_sound), false);
         Init();
+        SetSoundIcon();
     }
 
     private void Init() {
