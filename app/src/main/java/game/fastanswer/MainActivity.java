@@ -6,25 +6,20 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.TypedValue;
-import android.view.Gravity;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.widget.ImageSwitcher;
-import android.widget.TextSwitcher;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ViewSwitcher;
 
 import com.akexorcist.roundcornerprogressbar.IconRoundCornerProgressBar;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -32,8 +27,10 @@ import AppDialog.GameOverDialog;
 import AppDialog.PauseGameDialog;
 import Entities.GameColor;
 import Entities.GamePlay;
+import Entities.GameQuestions;
 import Interface.IOnCounterTimerFinish;
 import Utilities.CounterTimer;
+import Utilities.GameQuestionSwitcher;
 import Utilities.GameSound;
 
 
@@ -46,13 +43,13 @@ public class MainActivity extends AppCompatActivity implements IOnCounterTimerFi
     private static final int LEVEL_03 = 3;
     private static final int LEVEL_04 = 4;
     private static final int LEVEL_05 = 5;
+    private static final int SIZE_TEXT_RANDOM_RANGE = 8;
 
     private CounterTimer currentCounter;
     private CounterTimer defaultCounter;
     private IconRoundCornerProgressBar progressBar;
 
-    private TextSwitcher textSwitcherQuestion;
-    private ImageSwitcher imageSwitcherQuestion;
+    private GameQuestionSwitcher gameQuestionSwitcher;
 
     private TextView textAnswer02;
     private TextView textAnswer01;
@@ -60,7 +57,6 @@ public class MainActivity extends AppCompatActivity implements IOnCounterTimerFi
 
     private Typeface FontSnapITC;
 
-    private long timeLeft = 0;
     private int index = 0;
     private int defaultTextSize;
     private PauseGameDialog pauseGameDialog;
@@ -71,6 +67,7 @@ public class MainActivity extends AppCompatActivity implements IOnCounterTimerFi
 
     private GameSound gameSound;
     private InterstitialAd mInterstitialAd;
+    private AdView mAdView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,14 +78,12 @@ public class MainActivity extends AppCompatActivity implements IOnCounterTimerFi
         init();
         loadAdMobView();
         setUpProgressBar();
-        setUpTextQuestion();
         CreateGamePlay();
     }
 
     private void init() {
         progressBar = (IconRoundCornerProgressBar) findViewById(R.id.progress_2);
-        textSwitcherQuestion = (TextSwitcher) findViewById(R.id.textswitcher_question);
-        imageSwitcherQuestion = (ImageSwitcher) findViewById(R.id.imageswitcher_question);
+        gameQuestionSwitcher = (GameQuestionSwitcher) findViewById(R.id.game_switcher_question);
 
         textQuestionHeader = (TextView) findViewById(R.id.text_question_header);
         textAnswer01 = (TextView) findViewById(R.id.text_answer01);
@@ -110,6 +105,7 @@ public class MainActivity extends AppCompatActivity implements IOnCounterTimerFi
         textAnswer01.setTypeface(FontSnapITC);
         textAnswer02.setTypeface(FontSnapITC);
         textQuestionHeader.setTypeface(FontSnapITC);
+        gameQuestionSwitcher.setFont(FontSnapITC);
     }
 
     private void getTypeFaceFromAssert() {
@@ -121,73 +117,26 @@ public class MainActivity extends AppCompatActivity implements IOnCounterTimerFi
         progressBar.setSecondaryProgressColor(Color.parseColor("#F06292"));
         progressBar.setProgressBackgroundColor(Color.parseColor("#F8BBD0"));
         progressBar.setMax(MAX_TIME);
-        progressBar.setIconBackgroundColor(Color.parseColor("#F8BBD0"));
+        progressBar.setIconBackgroundColor(Color.parseColor("#E91E63"));
         progressBar.setIconImageResource(R.drawable.ic_clock);
     }
 
-    private void setUpTextQuestion() {
-        addAnimation();
-        makeView();
-        addEvent();
-    }
-
-    private void addAnimation() {
-        Animation in = AnimationUtils.loadAnimation(this, android.R.anim.slide_in_left);
-        Animation out = AnimationUtils.loadAnimation(this, android.R.anim.slide_out_right);
-        textSwitcherQuestion.setInAnimation(in);
-        textSwitcherQuestion.setOutAnimation(out);
-        imageSwitcherQuestion.setInAnimation(in);
-        imageSwitcherQuestion.setOutAnimation(out);
-    }
-
-    private void makeView() {
-        textSwitcherQuestion.setFactory(new ViewSwitcher.ViewFactory() {
-            @Override
-            public View makeView() {
-                TextView textContain = new TextView(MainActivity.this);
-                textContain.setGravity(Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL);
-                textContain.setTextSize(getResources().getDimensionPixelSize(R.dimen.answer_text_size));
-                textContain.setTypeface(FontSnapITC);
-                return textContain;
-            }
-        });
-    }
-
-    private void addEvent() {
-
-    }
 
     private void loadAdMobView() {
         MobileAds.initialize(getApplicationContext(),
                 "ca-app-pub-5794865694837942~5235770314");
-        AdView mAdView = (AdView) findViewById(R.id.adView);
+        RelativeLayout rl = (RelativeLayout) findViewById(R.id.adView);
+        mAdView = new AdView(getApplicationContext());
+        mAdView.setAdSize(AdSize.SMART_BANNER);
+        mAdView.setAdUnitId("ca-app-pub-5794865694837942/8189236713");
+        rl.addView(mAdView);
+
         AdRequest adRequest = new AdRequest.Builder().addTestDevice("ABF39522DBD56E4B15D7A6D9D6FF6547").build();
         mAdView.loadAd(adRequest);
+
         mInterstitialAd = new InterstitialAd(this);
-//        mInterstitialAd.setAdUnitId("ca-app-pub-5689571762868774/3432788847");
         mInterstitialAd.setAdUnitId("ca-app-pub-5794865694837942/3479835513");
         mInterstitialAd.loadAd(new AdRequest.Builder().addTestDevice("ABF39522DBD56E4B15D7A6D9D6FF6547").build());
-        mInterstitialAd.setAdListener(new AdListener() {
-            @Override
-            public void onAdClosed() {
-                Toast.makeText(getApplicationContext(), "Ad is closed!", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onAdFailedToLoad(int errorCode) {
-                Toast.makeText(getApplicationContext(), "Ad failed to load! error code: " + errorCode, Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onAdLeftApplication() {
-                Toast.makeText(getApplicationContext(), "Ad left application!", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onAdOpened() {
-                Toast.makeText(getApplicationContext(), "Ad is opened!", Toast.LENGTH_SHORT).show();
-            }
-        });
     }
 
     public void CreateGamePlay() {
@@ -207,20 +156,32 @@ public class MainActivity extends AppCompatActivity implements IOnCounterTimerFi
         NextQuestion();
     }
 
-
     public void Answer01(View v) {
         if (MatchAnswer(textAnswer01)) {
             NextQuestion();
         } else {
-            ShowGameOverDialog();
+            ShowGameOverDialogIfPossible();
         }
     }
 
-    private void ShowGameOverDialog() {
-        gameSound.PlayGameOverSound();
-        currentCounter.cancel();
+    private void ShowGameOverDialogIfPossible() {
+        if (!gameOverDialog.isShowing()) {
+            gameSound.PlayGameOverSound();
+            ShowGameDialog();
+        }
+    }
+
+    private void ShowGameDialog() {
+        StopCounter();
         gameOverDialog = new GameOverDialog(this, gamePlay.getScore());
         gameOverDialog.show();
+        AddAdMob();
+    }
+
+    private void StopCounter() {
+        currentCounter.cancel();
+    }
+    private void AddAdMob() {
         if (mInterstitialAd.isLoaded())
             mInterstitialAd.show();
     }
@@ -229,7 +190,7 @@ public class MainActivity extends AppCompatActivity implements IOnCounterTimerFi
         if (MatchAnswer(textAnswer02))
             NextQuestion();
         else {
-            ShowGameOverDialog();
+            ShowGameOverDialogIfPossible();
         }
     }
 
@@ -244,18 +205,17 @@ public class MainActivity extends AppCompatActivity implements IOnCounterTimerFi
         Random rd = new Random();
 
         int lenColor = gamePlay.getListGameColor().size();
-        int lenQuestion = gamePlay.getListGameQuestion().size();
+        int lenQuestion = gamePlay.getGameQuestion().getListQuestion().size();
 
         rightColor = rd.nextInt(lenColor);
         int indexAnswerColor1 = rd.nextInt(lenColor);
         int indexAnswerColor2 = rd.nextInt(lenColor);
 
-//        int indexColorText = rd.nextInt(lenColor);
-        int indexQuestionText = rd.nextInt(lenQuestion);
+        int indexQuestion = rd.nextInt(lenQuestion);
 
         int wrongColor;
         do {
-            wrongColor = rd.nextInt(lenQuestion);
+            wrongColor = rd.nextInt(lenColor);
         } while (rightColor == wrongColor);
 
         int rightAnswerColor01;
@@ -307,13 +267,13 @@ public class MainActivity extends AppCompatActivity implements IOnCounterTimerFi
         }
 
         ResetCounterTimer();
-        SetQuestion(rightColor, indexQuestionText);
+        SetQuestion(rightColor, indexQuestion);
         SetAnswer(rightColor, wrongColor, rightAnswerColor01, rightAnswerColor02);
         ++index;
     }
 
     private void SetTextSize() {
-        int rangeRandom = 8;
+        int rangeRandom = SIZE_TEXT_RANDOM_RANGE;
         Random rd = new Random();
         int rdValue1 = -rangeRandom + rd.nextInt(2 * rangeRandom + 2);
         int rdValue2 = -rangeRandom + rd.nextInt(2 * rangeRandom + 2);
@@ -331,12 +291,15 @@ public class MainActivity extends AppCompatActivity implements IOnCounterTimerFi
         currentCounter.start();
     }
 
-    private void SetQuestion(int indexColor, int indexQuestionText) {
-        String Question = gamePlay.getListGameQuestion().get(indexQuestionText);
+    private void SetQuestion(int indexColor, int indexQuestion) {
+
+        GameQuestions questionShape = gamePlay.getGameQuestion();
+        Object gameQuestion = questionShape.getListQuestion().get(indexQuestion);
+        int colorResID = gamePlay.getListGameColor().get(indexColor).getColor();
 
         textQuestionHeader.setText(QUESTION_HEADER + (index + 1));
-        textSwitcherQuestion.setText(Question);
-        ((TextView) textSwitcherQuestion.getCurrentView()).setTextColor(gamePlay.getListGameColor().get(indexColor).getColor());
+        Log.d("GameQuestionSwitcher", "Question " + (index + 1));
+        gameQuestionSwitcher.setGameQuestionView(gameQuestion, colorResID);
     }
 
     private void SetAnswer(int indexColor, int indexWrongColor, int rightAnswerColor01, int rightAnswerColor02) {
@@ -370,7 +333,6 @@ public class MainActivity extends AppCompatActivity implements IOnCounterTimerFi
 
     @Override
     protected void onStop() {
-        timeLeft = currentCounter.getMillisecondsLeft();
         currentCounter.cancel();
         super.onStop();
     }
@@ -379,7 +341,7 @@ public class MainActivity extends AppCompatActivity implements IOnCounterTimerFi
     @Override
     public void onFinished() {
         if (checkDialogIsShowing()) {
-            ShowGameOverDialog();
+            ShowGameOverDialogIfPossible();
         }
     }
 
@@ -411,17 +373,29 @@ public class MainActivity extends AppCompatActivity implements IOnCounterTimerFi
 
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mAdView.resume();
+    }
+
+    @Override
+    protected void onDestroy() {
+        mAdView.destroy();
+        super.onDestroy();
+    }
+
+    @Override
+    protected void onPause() {
+        mAdView.pause();
+        super.onPause();
+    }
+
     void initQuestion() {
         List<GameColor> gameColors = AddGameColor();
-        List<String> gameQuestions = AddQuestion();
+        GameQuestions gameQuestions = AddQuestion();
         gamePlay = new GamePlay(gameColors, gameQuestions);
 
-//        listQuest = new ArrayList<>();
-//        Q1();
-//        Q2();
-//        Q3();
-//        Q4();
-//        Q5();
     }
 
     private List<GameColor> AddGameColor() {
@@ -442,10 +416,8 @@ public class MainActivity extends AppCompatActivity implements IOnCounterTimerFi
         return gameColors;
     }
 
-    private List<String> AddQuestion() {
-        String[] q = {"Hình Tròn đ", "Hình Vuông đ", "Hình Chữ Nhật đ", "Hình Tam Giác đ"};
-        return Arrays.asList(q);
+    private GameQuestions AddQuestion() {
+        return GameQuestions.newInstance();
     }
-
 }
 

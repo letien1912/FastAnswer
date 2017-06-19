@@ -10,12 +10,12 @@ public class GamePlay {
     private static final long REDUCE_TIME_PER_LEVEL = 500;
 
     private List<GameColor> listGameColor;
-    private List<String> listGameQuestion;
+    private GameQuestions listGameQuestion;
     private int score;
     private int lv;
     private long time;
 
-    public GamePlay(List<GameColor> listGameColor, List<String> listGameQuestion) {
+    public GamePlay(List<GameColor> listGameColor, GameQuestions listGameQuestion) {
         this.listGameColor = listGameColor;
         this.listGameQuestion = listGameQuestion;
         score = -1;
@@ -27,7 +27,7 @@ public class GamePlay {
         return listGameColor;
     }
 
-    public List<String> getListGameQuestion() {
+    public GameQuestions getGameQuestion() {
         return listGameQuestion;
     }
 
@@ -37,14 +37,6 @@ public class GamePlay {
 
     public int getLv() {
         return lv;
-    }
-
-    public void setScore(int score) {
-        this.score = score;
-    }
-
-    public void setLv(int lv) {
-        this.lv = lv;
     }
 
     private void nextLevel() {
