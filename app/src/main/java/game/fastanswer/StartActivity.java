@@ -22,10 +22,10 @@ public class StartActivity extends AppCompatActivity {
 
     private void Init() {
         btSound = (ImageView) findViewById(R.id.button_sound);
-         sharedPref = getSharedPreferences(getString(R.string.pref_change_sound), MODE_PRIVATE);
+        sharedPref = getSharedPreferences(getString(R.string.pref_change_sound), MODE_PRIVATE);
     }
 
-    public  void ChangeSoundEvent(View v){
+    public void ChangeSoundEvent(View v) {
         ChangeSound();
         SetSoundIcon();
     }
@@ -39,15 +39,15 @@ public class StartActivity extends AppCompatActivity {
     }
 
     private void SetSoundIcon() {
-        Log.d("asdas",getSoundCurrent()+ "" );
-        if(getSoundCurrent()){
+        Log.d("asdas", getSoundCurrent() + "");
+        if (getSoundCurrent()) {
             btSound.setImageResource(R.drawable.ic_sound);
-        }else{
+        } else {
             btSound.setImageResource(R.drawable.ic_sound_turn_off);
         }
     }
 
-    private boolean getSoundCurrent(){
+    private boolean getSoundCurrent() {
         return sharedPref.getBoolean(getString(R.string.pref_change_sound), true);
     }
 
