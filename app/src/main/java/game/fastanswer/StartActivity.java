@@ -8,6 +8,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
+import Entities.GamePlay;
+
 public class StartActivity extends AppCompatActivity {
 
     private SharedPreferences sharedPref;
@@ -53,6 +55,8 @@ public class StartActivity extends AppCompatActivity {
 
     public void StartNewGame(View v) {
         Intent it = new Intent(this, MainActivity.class);
+        GamePlay gamePlay = (GamePlay) getIntent().getExtras().get(getString(R.string.GAMEPLAY_CONTENT));
+        it.putExtra(getString(R.string.GAMEPLAY_CONTENT), gamePlay);
         startActivity(it);
     }
 

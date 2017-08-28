@@ -1,10 +1,12 @@
 package Entities;
 
+import java.io.Serializable;
+
 /**
  * Created by Admin on 23/05/2017.
  */
 
-public class GameColor {
+public class GameColor implements Serializable {
     private int Color;
     private String ColorName;
 

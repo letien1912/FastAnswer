@@ -1,6 +1,7 @@
 package Utilities;
 
 import android.os.CountDownTimer;
+import android.widget.TextView;
 
 import com.akexorcist.roundcornerprogressbar.IconRoundCornerProgressBar;
 
@@ -13,18 +14,20 @@ import Interface.IOnCounterTimerFinish;
 public class CounterTimer extends CountDownTimer {
 
     private long millisInFuture;
-    private IconRoundCornerProgressBar counter;
+    private IconRoundCornerProgressBar progress;
+    private TextView textProgress;
     private long millisecondsLeft;
     private static final long SECONDARY_PROGRESS_RANGE = 50;
     private IOnCounterTimerFinish onCounterTimerFinish;
 
-    public CounterTimer(long millisInFuture, long countDownInterval, IconRoundCornerProgressBar counter,
-                        IOnCounterTimerFinish onCounterTimerFinish) {
+    public CounterTimer(long millisInFuture, long countDownInterval, IconRoundCornerProgressBar progress,
+                        IOnCounterTimerFinish onCounterTimerFinish, TextView textProgress) {
         super(millisInFuture, countDownInterval);
         this.millisInFuture = millisInFuture;
         this.millisecondsLeft = millisInFuture;
-        this.counter = counter;
+        this.progress = progress;
         this.onCounterTimerFinish = onCounterTimerFinish;
+        this.textProgress = textProgress;
     }
 
     @Override
@@ -34,15 +37,17 @@ public class CounterTimer extends CountDownTimer {
     }
 
     private void SetCounterProgress(long millisUntilFinished) {
-        counter.setProgress(millisUntilFinished);
-        counter.setSecondaryProgress(millisUntilFinished + SECONDARY_PROGRESS_RANGE);
+        textProgress.setText(millisUntilFinished/100.0 + "");
+        progress.setProgress(millisUntilFinished);
+        progress.setSecondaryProgress(millisUntilFinished + SECONDARY_PROGRESS_RANGE);
     }
 
     @Override
     public void onFinish() {
-        millisecondsLeft = 0;
-        counter.setProgress(millisecondsLeft);
-        counter.setSecondaryProgress(millisecondsLeft);
+        millisecondsLeft = SECONDARY_PROGRESS_RANGE;
+        progress.setProgress(millisecondsLeft);
+        textProgress.setText("0.0");
+        progress.setSecondaryProgress(millisecondsLeft);
         onCounterTimerFinish.onFinished();
     }
 

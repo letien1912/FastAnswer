@@ -12,6 +12,9 @@ import android.view.Window;
 import android.widget.TextView;
 
 import com.akexorcist.roundcornerprogressbar.IconRoundCornerProgressBar;
+import com.akexorcist.roundcornerprogressbar.TextRoundCornerProgressBar;
+
+import org.w3c.dom.Text;
 
 import Utilities.CounterTimer;
 import game.fastanswer.MainActivity;
@@ -23,12 +26,13 @@ public class PauseGameDialog extends Dialog implements View.OnClickListener {
     private Typeface FontShowG;
     private TextView textPauseGame;
     private CounterTimer counterTimer;
-
-    public PauseGameDialog(@NonNull Context context, CounterTimer counterTimer, IconRoundCornerProgressBar progressBar) {
+    private TextView textProgress;
+    public PauseGameDialog(@NonNull Context context, CounterTimer counterTimer, IconRoundCornerProgressBar progressBar, TextView textProgress) {
         super(context);
         this.counterTimer = counterTimer;
         this.progressBar = progressBar;
         mContext = context;
+        this.textProgress = textProgress;
     }
 
     @Override
@@ -105,7 +109,7 @@ public class PauseGameDialog extends Dialog implements View.OnClickListener {
     }
 
     private void ContinueCountTimer() {
-        counterTimer = new CounterTimer(counterTimer.getMillisecondsLeft(), 10, progressBar, ((MainActivity) mContext));
+        counterTimer = new CounterTimer(counterTimer.getMillisecondsLeft(), 10, progressBar, ((MainActivity) mContext),textProgress);
         ((MainActivity) mContext).setCurrentCounter(counterTimer);
         counterTimer.start();
     }

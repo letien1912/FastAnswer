@@ -28,7 +28,7 @@ public class GameDrawingShapes {
         paint = new Paint();
     }
 
-    public Drawable Draw(int colorResID, GameShapes gameShape) {
+    public Drawable Draw(int colorResID, ShapesQuestion gameShape) {
         bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
         canvas = new Canvas(bitmap);
         paint.setColor(colorResID);

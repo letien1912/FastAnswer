@@ -2,9 +2,10 @@ package Entities;
 
 import android.util.Log;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class GamePlay {
+public class GamePlay implements Serializable {
     public final static long MAX_TIME = 4000;
     private final static long MIN_TIME = 2000;
     private static final long REDUCE_TIME_PER_LEVEL = 500;
@@ -75,5 +76,13 @@ public class GamePlay {
 
     public long getTime() {
         return time;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
+    }
+
+    public void setLv(int lv) {
+        this.lv = lv;
     }
 }

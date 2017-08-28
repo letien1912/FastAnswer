@@ -13,4 +13,6 @@
     <string name="pause_game">Pause Game</string>
     <string name="pref_change_sound">pref_change_sound</string>
     <string name="pref_high_score">pref_high_score</string>
+    <string name="GAMEPLAY_CONTENT">SEND_GAMEPLAY</string>
+    <string name="DefaultTimeCountDown">04:00</string>
 </resources>
