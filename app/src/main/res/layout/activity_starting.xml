@@ -18,9 +18,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:paddingBottom="30dp"
-        android:paddingLeft="50dp"
-        android:paddingRight="50dp"
-        >
+        android:paddingLeft="80dp"
+        android:paddingRight="80dp" >
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -31,7 +30,7 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
+            android:layout_alignParentEnd="true"
             android:src="@drawable/ic_sound"
             android:contentDescription="@string/change_sound_volume"
             android:onClick="ChangeSoundEvent"
@@ -43,6 +42,7 @@
             android:layout_alignBottom="@+id/button_sound"
             android:onClick="ViewScoreEvent"
             android:contentDescription="@string/score"
-            android:layout_alignParentEnd="true"/>
+            android:layout_alignParentEnd="true"
+            android:visibility="gone"/>
     </RelativeLayout>
 </RelativeLayout>

@@ -78,17 +78,16 @@ public class GameOverDialog extends Dialog implements View.OnClickListener {
         btShare.setOnClickListener(this);
 
         sharedPref = mContext.getSharedPreferences(mContext.getString(R.string.pref_change_sound), MODE_PRIVATE);
-        sound = sharedPref.getBoolean(mContext.getString(R.string.pref_change_sound), false);
+        sound = sharedPref.getBoolean(mContext.getString(R.string.pref_change_sound), true);
 
         SetSoundIcon();
     }
 
     private void SetSoundIcon(){
-        if(sound){
+        if(sound)
             btSound.setImageResource(R.drawable.ic_sound);
-        }else{
+        else
             btSound.setImageResource(R.drawable.ic_sound_turn_off);
-        }
     }
 
     private void addFontType() {
