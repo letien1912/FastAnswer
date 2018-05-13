@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "215594521524",
+    "firebase_url": "https://whats-color-69681557.firebaseio.com",
+    "project_id": "whats-color-69681557",
+    "storage_bucket": "whats-color-69681557.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:215594521524:android:f99ea9bbb85b3995",
+        "android_client_info": {
+          "package_name": "game.fastanswer"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "215594521524-g4p5aapudig0iq7vbb0j11cttf6vro7f.apps.googleusercontent.com",
+          "client_type": 3
+        },
+        {
+          "client_id": "215594521524-djcjtiiji9030s5s1qrmgsvthgk5m1n9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "game.fastanswer",
+            "certificate_hash": "71f3088f2c17ca745e5a3ed976dd47919ad016e6"
+          }
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyChkjXuXbYXfHIaByCJxFFKpMnvoMN87rQ"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "215594521524-g4p5aapudig0iq7vbb0j11cttf6vro7f.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

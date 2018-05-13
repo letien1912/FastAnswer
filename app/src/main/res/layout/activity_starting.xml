@@ -4,45 +4,42 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background"
     tools:context="game.fastanswer.StartActivity">
+
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_start"
-        android:contentDescription="@string/start_game_des"
         android:layout_centerInParent="true"
-        android:onClick="StartNewGame"/>
+        android:contentDescription="@string/start_game_des"
+        android:onClick="StartNewGame"
+        android:tint="@color/tint_icon"
+        android:src="@drawable/ic_start" />
+
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:paddingBottom="30dp"
         android:paddingLeft="80dp"
-        android:paddingRight="80dp" >
+        android:paddingRight="80dp">
+
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:contentDescription="@string/share_description"
+            android:tint="@color/tint_icon"
             android:onClick="ShareGameEvent"
-            android:src="@drawable/ic_share"/>
+            android:src="@drawable/ic_share" />
+
         <ImageView
+            android:id="@+id/button_sound"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
-            android:src="@drawable/ic_sound"
             android:contentDescription="@string/change_sound_volume"
+            android:tint="@color/tint_icon"
             android:onClick="ChangeSoundEvent"
-            android:id="@+id/button_sound" />
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_score"
-            android:layout_alignBottom="@+id/button_sound"
-            android:onClick="ViewScoreEvent"
-            android:contentDescription="@string/score"
-            android:layout_alignParentEnd="true"
-            android:visibility="gone"/>
+            android:src="@drawable/ic_sound" />
     </RelativeLayout>
 </RelativeLayout>

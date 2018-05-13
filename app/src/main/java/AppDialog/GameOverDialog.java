@@ -17,6 +17,10 @@ import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.games.Games;
+import com.google.android.gms.tasks.OnSuccessListener;
+
 import game.fastanswer.MainActivity;
 import game.fastanswer.R;
 
@@ -105,7 +109,7 @@ public class GameOverDialog extends Dialog implements View.OnClickListener {
     }
 
     private void ShowScore() {
-        SharedPreferences sharedPref = mContext.getSharedPreferences(mContext.getString(R.string.pref_high_score), MODE_APPEND);
+        SharedPreferences sharedPref = mContext.getSharedPreferences(mContext.getString(R.string.pref_high_score), Context.MODE_PRIVATE);
         int highScore = sharedPref.getInt(mContext.getString(R.string.pref_high_score), 0);
         if (currentScore > highScore) {
             SharedPreferences.Editor editHighScore = sharedPref.edit();
@@ -152,6 +156,17 @@ public class GameOverDialog extends Dialog implements View.OnClickListener {
         ((MainActivity) mContext).CreateGamePlay();
     }
 
+    private void showLeaderboard() {
+        Games.getLeaderboardsClient(this, GoogleSignIn.getLastSignedInAccount(this))
+                .getLeaderboardIntent("CgkItKe9k6MGEAIQAQ")
+                .addOnSuccessListener(new OnSuccessListener<Intent>() {
+                    @Override
+                    public void onSuccess(Intent intent) {
+                       startActivityForResult(intent, RC_LEADERBOARD_UI);
+                    }
+                });
+    }
+
     private void ShareGame() {
         String message = "Your Score is " + currentScore + " that so great !!!!";
         Intent share = new Intent(Intent.ACTION_SEND);
@@ -169,5 +184,9 @@ public class GameOverDialog extends Dialog implements View.OnClickListener {
         editor.commit();
 
         SetSoundIcon();
+    }
+
+    private boolean isSignedIn() {
+        return GoogleSignIn.getLastSignedInAccount(getContext()) != null;
     }
 }

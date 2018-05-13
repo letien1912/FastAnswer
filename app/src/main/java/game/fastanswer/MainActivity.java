@@ -12,8 +12,6 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.akexorcist.roundcornerprogressbar.IconRoundCornerProgressBar;
-import com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar;
-import com.akexorcist.roundcornerprogressbar.TextRoundCornerProgressBar;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;
